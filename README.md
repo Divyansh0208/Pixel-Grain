@@ -1,6 +1,6 @@
 # 🌾📷 Pixel-Grain
 
-> **Empowering India's agricultural supply chain — converting photo-level grain data into certified quality metrics, fair prices, and direct farmer-buyer connections.**
+> **Empowering India's agricultural supply chain — protecting consumers from adulteration and converting photo-level harvest data into certified quality metrics for fair, direct trade.**
 
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/Django-5.x-092E20?style=flat&logo=django&logoColor=white)
@@ -14,19 +14,26 @@
 
 ## 🚀 The Vision
 
-Pixel-Grain democratizes agricultural commerce across India. A farmer photographs their yield — wheat, rice, dal, or vegetables — and in seconds receives an **ML-certified quality grade**. That certification is broadcast to a curated network of buyers, wholesalers, and retailers. Autonomous AI agents handle matching, pricing suggestions, and notifications, so the farmer negotiates from a position of verified, data-backed quality — not guesswork.
+Pixel-Grain democratizes agricultural commerce and food safety across India through a dual-mode platform.
 
-**No middlemen. No manual grading bias. Just fair, transparent, tech-enabled trade.**
+For **Farmers**, it translates a simple smartphone photo into an ML-certified quality grade, allowing them to bypass subjective middlemen and negotiate fair prices directly on our automated marketplace. For **Consumers**, it acts as a digital inspection tool, detecting hidden micro-adulterants in daily groceries that the naked eye misses.
+
+**No middlemen. No manual guesswork. Just fair, transparent, tech-enabled agriculture from seed to kitchen.**
 
 ---
 
 ## ✨ Core Features
 
-### 🔍 ML-Powered Quality Verification
-- Farmers upload a photo of their grain/vegetable via the mobile-friendly web app or REST API
-- A custom **Computer Vision model** (PyTorch/TorchVision) analyzes pixel data for defects, moisture indicators, sizing uniformity, and overall health
-- Outputs a standardized **quality grade** (A+, A, B, C) with a confidence score and detailed breakdown
-- Grades are stored as immutable records — tamper-proof quality certificates
+### 🔍 ML-Powered Quality Verification (Farmer Mode)
+- Farmers upload a photo of their grain, seeds, or vegetables via the mobile-friendly web app or REST API
+- **₹5 Coin Calibration:** Uses a standard ₹5 coin placed in the frame as a mathematical reference point to instantly and objectively measure harvest size and diameter
+- A custom **Computer Vision model** (PyTorch) analyzes pixel data for genetic purity, defects, and sizing uniformity
+- Outputs a standardized **quality grade** (A+, A, B, C) which serves as an immutable, tamper-proof quality certificate for the marketplace
+
+### 🛒 Consumer Protection (Consumer Mode)
+- Everyday buyers scan loose daily commodities (pulses, tea leaves, spices) before purchasing
+- **Micro-Texture AI:** The edge-ready model differentiates genuine products from visually identical adulterants (e.g., dyed stones in dal or exhausted tea leaves)
+- Outputs an instant **Purity Percentage**, visually highlighting foreign particles directly on the screen to prevent health risks and financial loss
 
 ### 🤝 Direct Farmer-Buyer Marketplace
 - Farmers list certified produce with ML-generated quality metadata
@@ -37,7 +44,7 @@ Pixel-Grain democratizes agricultural commerce across India. A farmer photograph
 ### 🤖 Autonomous AI Agents (Celery + Google AI / Claude API)
 - **Buyer Match Agent:** Notifies registered buyers when a matching grade/commodity hits the market
 - **Price Forecast Agent:** Monitors mandi trends and alerts farmers to optimal selling windows
-- **Onboarding Agent:** Conversational chatbot (LLM-powered) to guide new farmers through listing, grading, and negotiations
+- **Onboarding Agent:** Conversational chatbot (LLM-powered) to guide new users through listing and scanning
 - **Quality Audit Agent:** Periodically re-evaluates grade consistency across similar listings
 
 ### 📊 Analytics Dashboard
@@ -49,23 +56,23 @@ Pixel-Grain democratizes agricultural commerce across India. A farmer photograph
 
 ## 🏗️ System Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                         CLIENT LAYER                        │
 │           Django Templates (HTMX) + REST API (DRF)          │
-│              Mobile PWA  ·  Buyer Web Portal                │
+│      Farmer PWA  ·  Consumer Scanner App  ·  Buyer Web      │
 └────────────────────────────┬────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────┐
 │                      DJANGO CORE (v5.x)                     │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ │
 │  │  accounts/   │ │  listings/   │ │  marketplace/        │ │
-│  │  (Farmers &  │ │  (Produce    │ │  (Bids, Trades,      │ │
-│  │   Buyers)    │ │   Listings)  │ │   Contracts)         │ │
+│  │  (Multi-Role │ │  (Produce    │ │  (Bids, Trades,      │ │
+│  │   Profiles)  │ │   Listings)  │ │   Contracts)         │ │
 │  └──────────────┘ └──────────────┘ └──────────────────────┘ │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ │
 │  │  grading/    │ │  agents/     │ │  analytics/          │ │
-│  │  (ML Grade   │ │  (Celery AI  │ │  (Dashboards,        │ │
+│  │  (Dual-Mode  │ │  (Celery AI  │ │  (Dashboards,        │ │
 │  │   Pipeline)  │ │   Tasks)     │ │   Reports)           │ │
 │  └──────────────┘ └──────────────┘ └──────────────────────┘ │
 └───────┬──────────────────┬────────────────────┬─────────────┘
@@ -79,6 +86,7 @@ Pixel-Grain democratizes agricultural commerce across India. A farmer photograph
 ┌───────▼──────────────────────────────────────────────────┐
 │              ML INFERENCE LAYER                          │
 │   PyTorch Model  ·  OpenCV Preprocessing  ·  S3 Storage  │
+│   (Object Detection & Micro-Texture Segmentation)        │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -141,22 +149,23 @@ pixel-grain/
 │   └── asgi.py                     # ASGI for Channels (WebSockets)
 │
 ├── apps/
-│   ├── accounts/                   # Farmer & Buyer user management
-│   │   ├── models.py               # FarmerProfile, BuyerProfile
+│   ├── accounts/                   # Multi-role user management
+│   │   ├── models.py               # FarmerProfile, BuyerProfile, ConsumerProfile
 │   │   ├── views.py
 │   │   ├── serializers.py          # DRF serializers
 │   │   ├── signals.py              # Post-registration hooks
 │   │   └── tests/
 │   │
-│   ├── grading/                    # ML quality verification pipeline
-│   │   ├── models.py               # GradeReport, GradeCertificate
+│   ├── grading/                    # Dual-mode ML pipeline
+│   │   ├── models.py               # GradeReport, PurityReport, GradeCertificate
 │   │   ├── ml/
 │   │   │   ├── model.py            # PyTorch model loader
-│   │   │   ├── preprocess.py       # OpenCV image preprocessing
-│   │   │   ├── inference.py        # Grade inference logic
+│   │   │   ├── preprocess.py       # OpenCV preprocessing (incl. coin calibration)
+│   │   │   ├── inference.py        # Grade + purity inference logic
+│   │   │   ├── calibration.py      # ₹5 coin reference measurement
 │   │   │   └── weights/            # Trained .pt model weights
-│   │   ├── tasks.py                # Celery: async grading jobs
-│   │   ├── views.py                # Upload & grade endpoints
+│   │   ├── tasks.py                # Celery: async grading & purity jobs
+│   │   ├── views.py                # Upload & grade endpoints (farmer + consumer)
 │   │   └── serializers.py
 │   │
 │   ├── listings/                   # Produce listing management
@@ -194,7 +203,7 @@ pixel-grain/
 │   └── dashboard/
 │
 ├── static/                         # CSS, JS, images
-├── media/                          # User-uploaded grain photos (dev)
+├── media/                          # User-uploaded photos (dev)
 │
 ├── docker/
 │   ├── Dockerfile
@@ -217,30 +226,65 @@ pixel-grain/
 
 ## ⚙️ Key Django App Details
 
-### `grading/` — The ML Pipeline Heart
+### `grading/` — The Dual-Mode ML Pipeline Heart
+
+The `grading` app serves two distinct pipelines, both running as async Celery tasks on the same underlying PyTorch infrastructure.
+
+**Farmer Mode** — Quality Grading:
 
 ```python
 # apps/grading/tasks.py
 from celery import shared_task
 from .ml.inference import GrainGrader
+from .ml.calibration import CoinCalibrator
 from .models import GradeReport
 
 @shared_task(bind=True, max_retries=3)
 def run_grading_pipeline(self, listing_id: int, image_s3_key: str):
     """
-    Async Celery task: download image → preprocess → infer → save grade report.
+    Async Celery task: download image → coin calibration → preprocess → infer → save grade report.
     Triggered immediately after a farmer uploads a photo.
     """
     try:
-        grader = GrainGrader.get_instance()          # Singleton model loader
-        grade_result = grader.grade(image_s3_key)    # Returns GradeResult dataclass
+        calibrator = CoinCalibrator()
+        scale_factor = calibrator.detect_coin_and_compute_scale(image_s3_key)  # ₹5 coin reference
+
+        grader = GrainGrader.get_instance()           # Singleton model loader
+        grade_result = grader.grade(image_s3_key, scale_factor=scale_factor)   # Returns GradeResult dataclass
         GradeReport.objects.create(
             listing_id=listing_id,
-            grade=grade_result.grade,                 # e.g. "A+"
-            confidence=grade_result.confidence,       # e.g. 0.94
+            grade=grade_result.grade,                  # e.g. "A+"
+            confidence=grade_result.confidence,        # e.g. 0.94
             defect_score=grade_result.defect_score,
             size_uniformity=grade_result.size_score,
             report_metadata=grade_result.full_report,
+        )
+    except Exception as exc:
+        raise self.retry(exc=exc, countdown=60)
+```
+
+**Consumer Mode** — Adulteration / Purity Check:
+
+```python
+# apps/grading/tasks.py
+from .ml.inference import PurityChecker
+from .models import PurityReport
+
+@shared_task(bind=True, max_retries=3)
+def run_purity_pipeline(self, scan_id: int, image_s3_key: str):
+    """
+    Async Celery task: detect micro-adulterants in consumer-scanned commodities.
+    Returns a purity percentage and a highlighted image overlay.
+    """
+    try:
+        checker = PurityChecker.get_instance()        # Micro-Texture segmentation model
+        result = checker.analyze(image_s3_key)        # Returns PurityResult dataclass
+        PurityReport.objects.create(
+            scan_id=scan_id,
+            purity_percentage=result.purity_pct,      # e.g. 87.3
+            adulterant_classes=result.adulterant_labels,  # e.g. ["dyed_stone", "husk"]
+            overlay_image_key=result.overlay_s3_key,  # Annotated image stored on S3
+            report_metadata=result.full_report,
         )
     except Exception as exc:
         raise self.retry(exc=exc, countdown=60)
@@ -309,8 +353,11 @@ def notify_matched_buyers(listing_id: int):
 |---|---|---|---|
 | `POST` | `/api/v1/auth/register/farmer/` | Farmer registration (OTP) | Public |
 | `POST` | `/api/v1/auth/register/buyer/` | Buyer registration | Public |
-| `POST` | `/api/v1/grading/upload/` | Upload grain photo → triggers ML | Farmer |
+| `POST` | `/api/v1/auth/register/consumer/` | Consumer registration | Public |
+| `POST` | `/api/v1/grading/upload/` | Upload grain photo → triggers ML grading | Farmer |
 | `GET` | `/api/v1/grading/{id}/report/` | Fetch grade report | Farmer/Buyer |
+| `POST` | `/api/v1/grading/scan/` | Upload commodity photo → triggers purity check | Consumer |
+| `GET` | `/api/v1/grading/scan/{id}/report/` | Fetch purity report with overlay image | Consumer |
 | `POST` | `/api/v1/listings/` | Create certified listing | Farmer |
 | `GET` | `/api/v1/listings/` | Browse listings (filter/search) | Buyer |
 | `POST` | `/api/v1/marketplace/bids/` | Place a bid | Buyer |
@@ -328,20 +375,23 @@ def notify_matched_buyers(listing_id: int):
 - [ ] Farmer & Buyer authentication (phone OTP via Twilio/MSG91)
 - [ ] Image upload pipeline with S3 storage
 - [ ] ML grading model (initial training on common Indian grains: wheat, rice, moong dal)
+- [ ] ₹5 coin calibration module for objective size measurement
 - [ ] Listing creation and browsing API
 - [ ] Basic buyer-farmer messaging
 
-### Phase 2 — Marketplace & Real-time Features
+### Phase 2 — Marketplace & Consumer Mode
 - [ ] Live bidding with Django Channels WebSockets
 - [ ] Fair price engine (APMC mandi data integration)
 - [ ] Buyer match agent (Celery Beat periodic tasks)
 - [ ] Digital trade contract generation (PDF via WeasyPrint)
 - [ ] Payment integration (Razorpay)
+- [ ] Consumer purity scanning pipeline (Micro-Texture AI model)
+- [ ] Purity report with visual overlay highlighting adulterants
 
 ### Phase 3 — Intelligence & Scale
 - [ ] Price forecast agent with LSTM-based time series
 - [ ] LLM-powered onboarding chatbot (multilingual: Hindi, regional languages)
-- [ ] Model expansion: vegetables, spices, pulses
+- [ ] Model expansion: vegetables, spices, pulses (grading + purity)
 - [ ] Ed-Tech module: gamified crop quality improvement courses
 - [ ] Mobile app (React Native consuming DRF API)
 
@@ -423,7 +473,7 @@ pytest
 # With coverage report
 pytest --cov=apps --cov-report=html
 
-# Run only grading pipeline tests
+# Run only grading pipeline tests (farmer + consumer modes)
 pytest apps/grading/tests/ -v
 
 # Run only marketplace tests
@@ -449,7 +499,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/pixelgrain
 # Redis
 REDIS_URL=redis://localhost:6379/0
 
-# AWS S3 (grain photo storage)
+# AWS S3 (grain photo & purity scan storage)
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_STORAGE_BUCKET_NAME=pixel-grain-photos
